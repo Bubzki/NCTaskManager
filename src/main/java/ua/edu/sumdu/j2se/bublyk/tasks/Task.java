@@ -2,8 +2,12 @@ package ua.edu.sumdu.j2se.bublyk.tasks;
 
 public class Task {
     private String title;
-    private int time, start, end, interval;
-    private boolean active, repeated;
+    private int time;
+    private int start;
+    private int end;
+    private int interval;
+    private boolean active;
+    private boolean repeated;
 
     /**
      * Constructor that creates an inactive task
@@ -40,7 +44,9 @@ public class Task {
     }
 
     /**
-     * Getter for a name of task.
+     * Getter for the task title.
+     *
+     * @return the task title
      */
     public String getTitle() {
         return title;
@@ -57,6 +63,8 @@ public class Task {
 
     /**
      * Getter for a task status.
+     *
+     * @return a task status
      */
     public boolean isActive() {
         return active;
@@ -163,7 +171,7 @@ public class Task {
                 return (current >= time ? -1 : time);
             } else {
                 if (current < end) {
-                    for (int i = start; i < end; i += interval) {
+                    for (int i = start; i <= end; i += interval) {
                         if (current < i) {
                             return i;
                         }
