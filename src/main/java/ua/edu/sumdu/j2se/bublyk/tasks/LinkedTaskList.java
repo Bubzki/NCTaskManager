@@ -1,10 +1,91 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
-public class ArrayTaskList {
-    private final static int DEFAULT_CAPACITY = 10;
-    private final static float RATIO = 1.5f;
+public class LinkedTaskList {
     private int size;
-    private Task[] tasks = new Task[DEFAULT_CAPACITY];
+    private Node first;
+    private Node last;
+
+    /**
+     * The class for creating nodes that are components of a linked list.
+     * A node has an object stored in a list and links to the next and previous node.
+     */
+    private static class Node {
+        Task item;
+        Node next;
+        Node previous;
+
+        Node(Task item, Node previous, Node next) {
+            this.item = item;
+            this.previous = previous;
+            this.next = next;
+        }
+    }
+
+    /**
+     * The method searches for the node with the specified index.
+     *
+     * @param index the specified task index
+     *
+     * @return a node with the specified task index
+     */
+    private Node getNode(int index) {
+        Node temp;
+        if (index + 1 <= (Math.round((float)size / 2.))) {
+            temp = first;
+            for (int i = 0; i < index; ++i) {
+                temp = temp.next;
+            }
+        } else {
+            temp = last;
+            for (int i = size - 1; i > index; --i) {
+                temp = temp.previous;
+            }
+        }
+        return temp;
+    }
+
+    /**
+     * The method that creates a non-null node with the specified task.
+     *
+     * @param item task that need add to node
+     */
+    private void createNode(Task item) {
+        Node last = this.last;
+        Node newNode = new Node(item, last, null);
+        this.last = newNode;
+        if (last == null) {
+            first = newNode;
+        } else {
+            last.next = newNode;
+        }
+        size++;
+    }
+
+    /**
+     * The method that deletes a non-null node with the specified task.
+     *
+     * @param node with the specified task that should be deleted
+     */
+    private void deleteNode(Node node) {
+        if (size > 1) {
+            if (node.previous == null) {
+                first = node.next;
+                node.next.previous = null;
+                node.next = null;
+            } else if (node.next == null) {
+                last = node.previous;
+                node.previous.next = null;
+                node.previous = null;
+            } else {
+                node.previous.next = node.next;
+                node.next.previous = node.previous;
+                node.next = null;
+                node.previous = null;
+            }
+        }
+        node.item = null;
+        size--;
+    }
 
     /**
      * The method that add a task to the list and
@@ -18,13 +99,7 @@ public class ArrayTaskList {
         if (task == null) {
             throw new NullPointerException("Cannot add null pointer.");
         }
-        if (size == tasks.length) {
-            Task[] tempTasks = new Task[Math.round(size * RATIO)];
-            System.arraycopy(tasks, 0, tempTasks, 0, size);
-            tasks = tempTasks;
-        }
-        tasks[size] = task;
-        size++;
+        createNode(task);
     }
 
     /**
@@ -33,7 +108,6 @@ public class ArrayTaskList {
      * it will delete such task, which was added the first.
      *
      * @param task a specified task that needs to remove
-     *
      * @return "true" if the task on the list, "false" if the task not on the list
      *
      * @throws NullPointerException if task is null pointer
@@ -43,14 +117,9 @@ public class ArrayTaskList {
             throw new NullPointerException("Cannot remove null pointer.");
         }
         if (size != 0) {
-            for (int i = 0; i < size; ++i) {
-                if (task.equals(tasks[i])) {
-                    if (i != size - 1) {
-                        System.arraycopy(tasks, i + 1, tasks, i, size - i - 1);
-                    }
-                    tasks[size - 1] = null;
-                    size--;
-                    trimCapacity();
+            for (Node temp = first; temp != null; temp = temp.next) {
+                if (task.equals(temp.item)) {
+                    deleteNode(temp);
                     return true;
                 }
             }
@@ -68,33 +137,6 @@ public class ArrayTaskList {
     }
 
     /**
-     * The method that decreases array capacity by one third,
-     * if the capacity is equal or more than 1.5 times the number of elements
-     */
-    private void trimCapacity() {
-        if (size != 0 && ((float)tasks.length / (float)size) >= RATIO
-                && tasks.length > DEFAULT_CAPACITY) {
-            Task[] tempTasks;
-            if ((tasks.length / RATIO) <= DEFAULT_CAPACITY) {
-                tempTasks = new Task[DEFAULT_CAPACITY];
-            } else {
-                tempTasks = new Task[Math.round(tasks.length / RATIO)];
-            }
-            System.arraycopy(tasks, 0, tempTasks, 0, size);
-            tasks = tempTasks;
-        }
-    }
-
-    /**
-     * Getter for an array capacity.
-     *
-     * @return an array capacity
-     */
-    public int capacity() {
-        return tasks.length;
-    }
-
-    /**
      * The method that returns the task that is at the specified location in list,
      * the first task has an index of 0.
      *
@@ -108,7 +150,7 @@ public class ArrayTaskList {
         if (index >= size) {
             throw new IndexOutOfBoundsException("The index is out of range.");
         }
-        return tasks[index];
+        return getNode(index).item;
     }
 
     /**
@@ -117,23 +159,22 @@ public class ArrayTaskList {
      *
      * @param from the start time of the interval
      * @param to the end time of the interval
-     *
      * @return the subset of tasks that fit the specified time period
      *
      * @throws IllegalArgumentException if timestamps are negative or "from" is greater than "to"
      */
-    public ArrayTaskList incoming(int from, int to) throws IllegalArgumentException {
+    public LinkedTaskList incoming(int from, int to) throws IllegalArgumentException {
         if (from < 0 || to < 0) {
             throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
         }
         if (from > to) {
             throw new IllegalArgumentException("Time \"to\" must be greater than \"from\".");
         }
-        ArrayTaskList tempTaskList = new ArrayTaskList();
+        LinkedTaskList tempTaskList = new LinkedTaskList();
         for (int i = 0; i < this.size; ++i) {
             if (getTask(i).nextTimeAfter(from) != -1 && getTask(i).getStartTime() <= to) {
                 for (int j = getTask(i).getStartTime(); j <= getTask(i).getEndTime();
-                        j += getTask(i).getRepeatInterval()) {
+                     j += getTask(i).getRepeatInterval()) {
                     if (j > from && j <= to) {
                         tempTaskList.add(getTask(i));
                         break;
