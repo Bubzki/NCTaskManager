@@ -16,9 +16,14 @@ public class Task {
      *
      * @param title  the task name
      * @param time  the notification time
+     *
+     * @throws IllegalArgumentException if "time" is negative
      */
-    public Task(String title, int time) {
+    public Task(String title, int time) throws IllegalArgumentException {
         this.title = title;
+        if (time < 0) {
+            throw new IllegalArgumentException("Time must equal to zero or be greater than it.");
+        }
         this.time = time;
         this.active = false;
         this.repeated = false;
@@ -33,11 +38,23 @@ public class Task {
      * @param start  the notification start time
      * @param end  the notification end time
      * @param interval  Time interval after which it is necessary to repeat task notification.
+     *
+     * @throws IllegalArgumentException if timestamps are negative, "start" is greater than "end"
+     * or "interval" isn't positive
      */
-    public Task(String title, int start, int end, int interval) {
+    public Task(String title, int start, int end, int interval) throws IllegalArgumentException {
         this.title = title;
+        if (start < 0 || end < 0) {
+            throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
+        }
+        if (start > end) {
+            throw new IllegalArgumentException("The end of task must be greater than the start of task.");
+        }
         this.start = start;
         this.end = end;
+        if (interval <= 0) {
+            throw new IllegalArgumentException("Interval must be greater than zero.");
+        }
         this.interval = interval;
         this.active = false;
         this.repeated = true;
@@ -93,13 +110,18 @@ public class Task {
      * If a task is repeating, then it should become non-repeating.
      *
      * @param time  notification time
+     *
+     * @throws IllegalArgumentException if time is negative
      */
-    public void setTime(int time) {
+    public void setTime(int time) throws IllegalArgumentException {
         if (isRepeated()) {
             this.repeated = false;
             this.start = 0;
             this.end = 0;
             this.interval = 0;
+        }
+        if (time < 0) {
+            throw new IllegalArgumentException("Time must equal to zero or be greater than it.");
         }
         this.time = time;
     }
@@ -138,14 +160,25 @@ public class Task {
      * @param start  the notification start time
      * @param end  the notification end time
      * @param interval  Time interval after which it is necessary to repeat task notification.
+     *
+     * @throws IllegalArgumentException if timestamps are negative or "interval" isn't positive
      */
-    public void setTime(int start, int end, int interval) {
+    public void setTime(int start, int end, int interval) throws IllegalArgumentException {
         if (!isRepeated()) {
             this.repeated = true;
             this.time = 0;
         }
+        if (start < 0 || end < 0) {
+            throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
+        }
+        if (start > end) {
+            throw new IllegalArgumentException("The end of task must be greater than the start of task.");
+        }
         this.start = start;
         this.end = end;
+        if (interval <= 0) {
+            throw new IllegalArgumentException("Interval must be greater than zero.");
+        }
         this.interval = interval;
     }
 
@@ -161,11 +194,17 @@ public class Task {
     /**
      * The method which returns the time of the next task execution.
      *
+     * @param current the specified time
+     *
      * @return Return the time of the next task execution after the specified time,
      * if after the specified time a task wasn't executed, then the method returns "-1".
-     * @param current the specified time
+     *
+     * @throws IllegalArgumentException if "specified time" is negative
      */
-    public int nextTimeAfter(int current) {
+    public int nextTimeAfter(int current) throws IllegalArgumentException {
+        if (current < 0) {
+            throw new IllegalArgumentException("Specified time must equal to zero or be greater than it.");
+        }
         if (isActive()) {
             if (!isRepeated()) {
                 return (current >= time ? -1 : time);
