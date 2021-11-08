@@ -1,6 +1,6 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
-public class ArrayTaskList {
+public class ArrayTaskList extends AbstractTaskList {
     private final static int DEFAULT_CAPACITY = 10;
     private final static float RATIO = 1.5f;
     private int size;
@@ -86,15 +86,6 @@ public class ArrayTaskList {
     }
 
     /**
-     * Getter for an array capacity.
-     *
-     * @return an array capacity
-     */
-    public int capacity() {
-        return tasks.length;
-    }
-
-    /**
      * The method that returns the task that is at the specified location in list,
      * the first task has an index of 0.
      *
@@ -109,38 +100,5 @@ public class ArrayTaskList {
             throw new IndexOutOfBoundsException("The index is out of range.");
         }
         return tasks[index];
-    }
-
-    /**
-     * The method that finds a subset of tasks
-     * that are scheduled to run at least once after time "from" and no later than "to".
-     *
-     * @param from the start time of the interval
-     * @param to the end time of the interval
-     *
-     * @return the subset of tasks that fit the specified time period
-     *
-     * @throws IllegalArgumentException if timestamps are negative or "from" is greater than "to"
-     */
-    public ArrayTaskList incoming(int from, int to) throws IllegalArgumentException {
-        if (from < 0 || to < 0) {
-            throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
-        }
-        if (from > to) {
-            throw new IllegalArgumentException("Time \"to\" must be greater than \"from\".");
-        }
-        ArrayTaskList tempTaskList = new ArrayTaskList();
-        for (int i = 0; i < this.size; ++i) {
-            if (getTask(i).nextTimeAfter(from) != -1 && getTask(i).getStartTime() <= to) {
-                for (int j = getTask(i).getStartTime(); j <= getTask(i).getEndTime();
-                        j += getTask(i).getRepeatInterval()) {
-                    if (j > from && j <= to) {
-                        tempTaskList.add(getTask(i));
-                        break;
-                    }
-                }
-            }
-        }
-        return tempTaskList;
     }
 }
