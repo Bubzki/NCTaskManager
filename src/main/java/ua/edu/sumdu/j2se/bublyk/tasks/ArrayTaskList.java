@@ -14,6 +14,7 @@ public class ArrayTaskList extends AbstractTaskList {
      *
      * @throws NullPointerException if task is null pointer
      */
+    @Override
     public void add(Task task) throws NullPointerException {
         if (task == null) {
             throw new NullPointerException("Cannot add null pointer.");
@@ -38,6 +39,7 @@ public class ArrayTaskList extends AbstractTaskList {
      *
      * @throws NullPointerException if task is null pointer
      */
+    @Override
     public boolean remove(Task task) throws NullPointerException {
         if (task == null) {
             throw new NullPointerException("Cannot remove null pointer.");
@@ -63,6 +65,7 @@ public class ArrayTaskList extends AbstractTaskList {
      *
      * @return the size of the list
      */
+    @Override
     public int size() {
         return size;
     }
@@ -95,10 +98,16 @@ public class ArrayTaskList extends AbstractTaskList {
      *
      * @throws IndexOutOfBoundsException if index is out of the list range.
      */
+    @Override
     public Task getTask(int index) throws IndexOutOfBoundsException {
         if (index >= size) {
             throw new IndexOutOfBoundsException("The index is out of range.");
         }
         return tasks[index];
+    }
+
+    @Override
+    protected ArrayTaskList getTaskList() {
+        return new ArrayTaskList();
     }
 }

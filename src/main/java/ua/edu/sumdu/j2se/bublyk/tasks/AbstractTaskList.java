@@ -18,7 +18,11 @@ public abstract class AbstractTaskList {
      *
      * @return the subset of tasks that fit the specified time period
      *
-     * @throws IllegalArgumentException if timestamps are negative or <code>from</code> is greater than <code>to</code>
+     * @throws IllegalArgumentException if...
+     * <ul>
+     * <li>timestamps are negative</li>
+     * <li><code>from</code> is greater than <code>to</code></li>
+     * </ul>
      */
     public AbstractTaskList incoming(int from, int to) throws IllegalArgumentException {
         if (from < 0 || to < 0) {
@@ -47,12 +51,5 @@ public abstract class AbstractTaskList {
      *
      * @return the specified object
      */
-    private AbstractTaskList getTaskList() {
-        if (this.getClass().equals(ArrayTaskList.class)) {
-            return TaskListFactory.createTaskList(ListTypes.types.ARRAY);
-        }
-        else {
-            return TaskListFactory.createTaskList(ListTypes.types.LINKED);
-        }
-    }
+    protected abstract AbstractTaskList getTaskList();
 }
