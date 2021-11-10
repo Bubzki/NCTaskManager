@@ -1,6 +1,6 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
-public class LinkedTaskList {
+public class LinkedTaskList extends AbstractTaskList {
     private int size;
     private Node first;
     private Node last;
@@ -88,13 +88,13 @@ public class LinkedTaskList {
     }
 
     /**
-     * The method that add a task to the list and
-     * increases array capacity to 1.5 times if size is greater than capacity.
+     * The method that add a task to the list.
      *
      * @param task a specified task that needs to add
      *
      * @throws NullPointerException if task is null pointer
      */
+    @Override
     public void add(Task task) throws NullPointerException {
         if (task == null) {
             throw new NullPointerException("Cannot add null pointer.");
@@ -112,6 +112,7 @@ public class LinkedTaskList {
      *
      * @throws NullPointerException if task is null pointer
      */
+    @Override
     public boolean remove(Task task) throws NullPointerException {
         if (task == null) {
             throw new NullPointerException("Cannot remove null pointer.");
@@ -132,6 +133,7 @@ public class LinkedTaskList {
      *
      * @return the size of the list
      */
+    @Override
     public int size() {
         return size;
     }
@@ -146,6 +148,7 @@ public class LinkedTaskList {
      *
      * @throws IndexOutOfBoundsException if index is out of the list range.
      */
+    @Override
     public Task getTask(int index) throws IndexOutOfBoundsException {
         if (index >= size) {
             throw new IndexOutOfBoundsException("The index is out of range.");
@@ -153,35 +156,8 @@ public class LinkedTaskList {
         return getNode(index).item;
     }
 
-    /**
-     * The method that finds a subset of tasks
-     * that are scheduled to run at least once after time "from" and no later than "to".
-     *
-     * @param from the start time of the interval
-     * @param to the end time of the interval
-     * @return the subset of tasks that fit the specified time period
-     *
-     * @throws IllegalArgumentException if timestamps are negative or "from" is greater than "to"
-     */
-    public LinkedTaskList incoming(int from, int to) throws IllegalArgumentException {
-        if (from < 0 || to < 0) {
-            throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
-        }
-        if (from > to) {
-            throw new IllegalArgumentException("Time \"to\" must be greater than \"from\".");
-        }
-        LinkedTaskList tempTaskList = new LinkedTaskList();
-        for (int i = 0; i < this.size; ++i) {
-            if (getTask(i).nextTimeAfter(from) != -1 && getTask(i).getStartTime() <= to) {
-                for (int j = getTask(i).getStartTime(); j <= getTask(i).getEndTime();
-                     j += getTask(i).getRepeatInterval()) {
-                    if (j > from && j <= to) {
-                        tempTaskList.add(getTask(i));
-                        break;
-                    }
-                }
-            }
-        }
-        return tempTaskList;
+    @Override
+    protected LinkedTaskList getTaskList() {
+        return new LinkedTaskList();
     }
 }
