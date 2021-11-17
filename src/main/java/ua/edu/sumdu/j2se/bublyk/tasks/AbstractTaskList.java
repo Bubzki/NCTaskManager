@@ -1,6 +1,8 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
-public abstract class AbstractTaskList {
+import java.util.Iterator;
+
+public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
     public abstract void add(Task task);
 
     public abstract boolean remove(Task task);
@@ -52,4 +54,9 @@ public abstract class AbstractTaskList {
      * @return the specified object
      */
     protected abstract AbstractTaskList getTaskList();
+
+    @Override
+    public AbstractTaskList clone() throws CloneNotSupportedException {
+        return (AbstractTaskList) super.clone();
+    }
 }

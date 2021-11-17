@@ -1,5 +1,9 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
 public class LinkedTaskList extends AbstractTaskList {
     private int size;
     private Node first;
@@ -18,6 +22,14 @@ public class LinkedTaskList extends AbstractTaskList {
             this.item = item;
             this.previous = previous;
             this.next = next;
+        }
+
+        public Node nodeClone() throws CloneNotSupportedException {
+            Node clone = new Node(item.clone(), previous, next);
+            for (Node temp = clone; temp.next != null; temp = temp.next) {
+                temp.next = new Node(temp.next.item, temp.next.previous, temp.next.next);
+            }
+            return clone;
         }
     }
 
@@ -82,6 +94,9 @@ public class LinkedTaskList extends AbstractTaskList {
                 node.next = null;
                 node.previous = null;
             }
+        } else {
+            first = null;
+            last = null;
         }
         node.item = null;
         size--;
@@ -159,5 +174,100 @@ public class LinkedTaskList extends AbstractTaskList {
     @Override
     protected LinkedTaskList getTaskList() {
         return new LinkedTaskList();
+    }
+
+    /**
+     * Returns an iterator over elements of type {@code Task}.
+     *
+     * @return an Iterator.
+     */
+    @Override
+    public Iterator<Task> iterator() {
+        return new Iterator<Task>() {
+            private Node currentElement;
+            private Node nextElement = first;
+
+            @Override
+            public boolean hasNext() {
+                return nextElement != null;
+            }
+
+            @Override
+            public Task next() throws NoSuchElementException {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("Iteration has no more elements.");
+                }
+                currentElement = nextElement;
+                nextElement = nextElement.next;
+                return currentElement.item;
+            }
+
+            @Override
+            public void remove() throws IllegalStateException {
+                if (currentElement == null) {
+                    throw new IllegalStateException();
+                }
+                LinkedTaskList.this.remove(currentElement.item);
+                currentElement = null;
+            }
+        };
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder tempString = new StringBuilder("LinkedTaskList(" + size() + "): [");
+        if (size() > 0) {
+            for (Task temp : this) {
+                tempString.append(temp.toString()).append(";").append("\n\t\t\t\t\t");
+            }
+            tempString.delete(tempString.length() - 7, tempString.length());
+        }
+        return tempString.append("]").toString();
+    }
+
+   @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        LinkedTaskList tempLinked = (LinkedTaskList) o;
+        if (size() != tempLinked.size()) {
+            return false;
+        }
+        for (Iterator<Task> i1 = this.iterator(), i2 = tempLinked.iterator(); i1.hasNext() && i2.hasNext();) {
+            if (!i1.next().equals(i2.next())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        if (this.first == null) {
+            return 0;
+        }
+        int result = Objects.hash(size);
+        int tempResult = 1;
+        for (Task temp : this) {
+            tempResult = 31 * tempResult + (temp == null ? 0 : temp.hashCode());
+        }
+        result = 31 * result + tempResult;
+        return result;
+    }
+
+    @Override
+    public LinkedTaskList clone() throws CloneNotSupportedException {
+        LinkedTaskList clone = (LinkedTaskList) super.clone();
+        if (first != null) {
+            clone.first = first.nodeClone();
+        }
+        if (last != null) {
+            clone.last = last.nodeClone();
+        }
+        return clone;
     }
 }

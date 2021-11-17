@@ -1,5 +1,10 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
 public class ArrayTaskList extends AbstractTaskList {
     private final static int DEFAULT_CAPACITY = 10;
     private final static float RATIO = 1.5f;
@@ -109,5 +114,83 @@ public class ArrayTaskList extends AbstractTaskList {
     @Override
     protected ArrayTaskList getTaskList() {
         return new ArrayTaskList();
+    }
+
+    /**
+     * Returns an iterator over elements of type {@code Task}.
+     *
+     * @return an Iterator.
+     */
+    @Override
+    public Iterator<Task> iterator() {
+        return new Iterator<Task>() {
+            private int size = size();
+            private int currentElement = -1;
+            private int nextElement;
+
+            @Override
+            public boolean hasNext() {
+                return size > nextElement && tasks[nextElement] != null;
+            }
+
+            @Override
+            public Task next() throws NoSuchElementException {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("Iteration has no more elements.");
+                }
+                nextElement++;
+                currentElement++;
+                return tasks[currentElement];
+            }
+
+            @Override
+            public void remove() throws IllegalStateException {
+                if (currentElement == -1) {
+                    throw new IllegalStateException();
+                }
+                ArrayTaskList.this.remove(tasks[currentElement]);
+                currentElement--;
+                nextElement--;
+                size--;
+            }
+        };
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder tempString = new StringBuilder("ArrayTaskList(" + size() + "): [");
+        if (size() > 0) {
+            for (Task temp : this) {
+                tempString.append(temp.toString()).append(";").append("\n\t\t\t\t\t");
+            }
+            tempString.delete(tempString.length() - 7, tempString.length());
+        }
+        return tempString.append("]").toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ArrayTaskList tempArray = (ArrayTaskList) o;
+        return size == tempArray.size && Arrays.equals(tasks, tempArray.tasks);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(size);
+        result = 31 * result + Arrays.hashCode(tasks);
+        return result;
+    }
+
+    @Override
+    public ArrayTaskList clone() throws CloneNotSupportedException {
+        ArrayTaskList clone = (ArrayTaskList) super.clone();
+        clone.tasks = tasks.clone();
+        return clone;
     }
 }
