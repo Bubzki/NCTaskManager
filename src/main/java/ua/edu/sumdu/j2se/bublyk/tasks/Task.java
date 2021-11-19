@@ -1,6 +1,8 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
-public class Task {
+import java.util.Objects;
+
+public class Task implements Cloneable {
     private String title;
     private int time;
     private int start;
@@ -20,10 +22,10 @@ public class Task {
      * @throws IllegalArgumentException if "time" is negative
      */
     public Task(String title, int time) throws IllegalArgumentException {
-        this.title = title;
         if (time < 0) {
             throw new IllegalArgumentException("Time must equal to zero or be greater than it.");
         }
+        this.title = title;
         this.time = time;
         this.active = false;
         this.repeated = false;
@@ -43,18 +45,18 @@ public class Task {
      * or "interval" isn't positive
      */
     public Task(String title, int start, int end, int interval) throws IllegalArgumentException {
-        this.title = title;
         if (start < 0 || end < 0) {
             throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
         }
         if (start > end) {
             throw new IllegalArgumentException("The end of task must be greater than the start of task.");
         }
-        this.start = start;
-        this.end = end;
         if (interval <= 0) {
             throw new IllegalArgumentException("Interval must be greater than zero.");
         }
+        this.title = title;
+        this.start = start;
+        this.end = end;
         this.interval = interval;
         this.active = false;
         this.repeated = true;
@@ -114,14 +116,14 @@ public class Task {
      * @throws IllegalArgumentException if time is negative
      */
     public void setTime(int time) throws IllegalArgumentException {
+        if (time < 0) {
+            throw new IllegalArgumentException("Time must equal to zero or be greater than it.");
+        }
         if (isRepeated()) {
             this.repeated = false;
             this.start = 0;
             this.end = 0;
             this.interval = 0;
-        }
-        if (time < 0) {
-            throw new IllegalArgumentException("Time must equal to zero or be greater than it.");
         }
         this.time = time;
     }
@@ -164,21 +166,21 @@ public class Task {
      * @throws IllegalArgumentException if timestamps are negative or "interval" isn't positive
      */
     public void setTime(int start, int end, int interval) throws IllegalArgumentException {
-        if (!isRepeated()) {
-            this.repeated = true;
-            this.time = 0;
-        }
         if (start < 0 || end < 0) {
             throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
         }
         if (start > end) {
             throw new IllegalArgumentException("The end of task must be greater than the start of task.");
         }
-        this.start = start;
-        this.end = end;
         if (interval <= 0) {
             throw new IllegalArgumentException("Interval must be greater than zero.");
         }
+        if (!isRepeated()) {
+            this.repeated = true;
+            this.time = 0;
+        }
+        this.start = start;
+        this.end = end;
         this.interval = interval;
     }
 
@@ -221,5 +223,40 @@ public class Task {
         } else {
             return -1;
         }
+    }
+
+    @Override
+    public String toString() {
+        if (isRepeated()) {
+            return "Task \"" + title + "\": {start = " + start
+                    + "; end = " + end + "; interval = " + interval
+                    + "; active -> " + active + "; repeated -> " + repeated + "}";
+        } else {
+            return "Task \"" + title + "\": {time = " + time
+                    + "; active -> " + active + "; repeated -> " + repeated + "}";
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Task task = (Task) o;
+        return time == task.time && start == task.start && end == task.end && interval == task.interval
+                && active == task.active && repeated == task.repeated && Objects.equals(title, task.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, time, start, end, interval, active, repeated);
+    }
+
+    @Override
+    public Task clone() throws CloneNotSupportedException {
+        return (Task) super.clone();
     }
 }
