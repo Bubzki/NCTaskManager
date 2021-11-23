@@ -1,6 +1,6 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
-import java.util.Iterator;
+import java.util.stream.Stream;
 
 public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
     public abstract void add(Task task);
@@ -26,7 +26,7 @@ public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
      * <li><code>from</code> is greater than <code>to</code></li>
      * </ul>
      */
-    public AbstractTaskList incoming(int from, int to) throws IllegalArgumentException {
+    public final AbstractTaskList incoming(int from, int to) throws IllegalArgumentException {
         if (from < 0 || to < 0) {
             throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
         }
@@ -34,17 +34,7 @@ public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
             throw new IllegalArgumentException("Time \"to\" must be greater than \"from\".");
         }
         AbstractTaskList tempTaskList = getTaskList();
-        for (int i = 0; i < size(); ++i) {
-            if (getTask(i).nextTimeAfter(from) != -1 && getTask(i).getStartTime() <= to) {
-                for (int j = getTask(i).getStartTime(); j <= getTask(i).getEndTime();
-                        j += getTask(i).getRepeatInterval()) {
-                    if (j > from && j <= to) {
-                        tempTaskList.add(getTask(i));
-                        break;
-                    }
-                }
-            }
-        }
+        getStream().filter((e) -> e.nextTimeAfter(from) != -1 && e.nextTimeAfter(from) <= to).forEach(tempTaskList::add);
         return tempTaskList;
     }
 
@@ -59,4 +49,11 @@ public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
     public AbstractTaskList clone() throws CloneNotSupportedException {
         return (AbstractTaskList) super.clone();
     }
+
+    /**
+     * The method that creates a stream of tasks from some list.
+     *
+     * @return the stream of tasks
+     */
+    public abstract Stream<Task> getStream();
 }

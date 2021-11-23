@@ -1,8 +1,8 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class LinkedTaskList extends AbstractTaskList {
     private int size;
@@ -269,5 +269,15 @@ public class LinkedTaskList extends AbstractTaskList {
             clone.last = last.nodeClone();
         }
         return clone;
+    }
+
+    @Override
+    public Spliterator<Task> spliterator() {
+        return Spliterators.spliterator(iterator(), size, Spliterator.SIZED | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+    }
+
+    @Override
+    public Stream<Task> getStream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 }
