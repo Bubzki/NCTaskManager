@@ -192,6 +192,9 @@ public class ArrayTaskList extends AbstractTaskList {
     public ArrayTaskList clone() throws CloneNotSupportedException {
         ArrayTaskList clone = (ArrayTaskList) super.clone();
         clone.tasks = tasks.clone();
+        for (int i = 0; i < clone.size(); ++i) {
+            clone.tasks[i] = clone.tasks[i].clone();
+        }
         return clone;
     }
 

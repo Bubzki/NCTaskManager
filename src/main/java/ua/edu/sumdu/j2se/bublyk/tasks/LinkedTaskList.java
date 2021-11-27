@@ -23,14 +23,6 @@ public class LinkedTaskList extends AbstractTaskList {
             this.previous = previous;
             this.next = next;
         }
-
-        public Node nodeClone() throws CloneNotSupportedException {
-            Node clone = new Node(item.clone(), previous, next);
-            for (Node temp = clone; temp.next != null; temp = temp.next) {
-                temp.next = new Node(temp.next.item, temp.next.previous, temp.next.next);
-            }
-            return clone;
-        }
     }
 
     /**
@@ -263,10 +255,12 @@ public class LinkedTaskList extends AbstractTaskList {
     public LinkedTaskList clone() throws CloneNotSupportedException {
         LinkedTaskList clone = (LinkedTaskList) super.clone();
         if (first != null) {
-            clone.first = first.nodeClone();
-        }
-        if (last != null) {
-            clone.last = last.nodeClone();
+            clone.first = null;
+            clone.last = null;
+            clone.size = 0;
+            for (Task temp : this) {
+                clone.add(temp.clone());
+            }
         }
         return clone;
     }
