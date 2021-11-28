@@ -1,5 +1,6 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
@@ -15,26 +16,27 @@ public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
      * The method that finds a subset of tasks
      * that are scheduled to run at least once after time <code>from</code> and no later than <code>to</code>.
      *
-     * @param from the start time of the interval
-     * @param to the end time of the interval
+     * @param from the start time of the period
+     * @param to the end time of the period
      *
      * @return the subset of tasks that fit the specified time period
      *
      * @throws IllegalArgumentException if...
      * <ul>
-     * <li>timestamps are negative</li>
-     * <li><code>from</code> is greater than <code>to</code></li>
+     * <li>timestamps are null;</li>
+     * <li><code>from</code> is greater than <code>to</code>.</li>
      * </ul>
      */
-    public final AbstractTaskList incoming(int from, int to) throws IllegalArgumentException {
-        if (from < 0 || to < 0) {
+    public final AbstractTaskList incoming(LocalDateTime from, LocalDateTime to) throws IllegalArgumentException {
+        if (from == null || to == null) {
             throw new IllegalArgumentException("Timestamps must equal to zero or be greater than it.");
         }
-        if (from > to) {
+        if (from.isAfter(to)) {
             throw new IllegalArgumentException("Time \"to\" must be greater than \"from\".");
         }
         AbstractTaskList tempTaskList = getTaskList();
-        getStream().filter((e) -> e.nextTimeAfter(from) != -1 && e.nextTimeAfter(from) <= to).forEach(tempTaskList::add);
+        getStream().filter((e) -> e.nextTimeAfter(from) != null && (e.nextTimeAfter(from).isBefore(to) || e.nextTimeAfter(from).isEqual(to)))
+                .forEach(tempTaskList::add);
         return tempTaskList;
     }
 
