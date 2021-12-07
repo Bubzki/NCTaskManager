@@ -18,10 +18,55 @@ public class LinkedTaskList extends AbstractTaskList {
         Node next;
         Node previous;
 
+        /**
+         * Constructor that creates a <code>node</code> with links
+         * to previous & next <code>node</code>,
+         * and an element of {@link Task} type.
+         *
+         * @param item the element of {@link Task} type
+         * @param previous the link to previous <code>node</code>
+         * @param next the link to next <code>node</code>
+         */
         Node(Task item, Node previous, Node next) {
             this.item = item;
             this.previous = previous;
             this.next = next;
+        }
+
+        /**
+         * The method that clones all nodes at once.
+         *
+         * @return the first cloning node
+         *
+         * @throws CloneNotSupportedException if class Task and deeper classes...
+         * <ul>
+         * <li>don't support cloning;</li>
+         * <li>don't implement {@link Cloneable}.</li>
+         * </ul>
+         */
+        private Node nodeClone() throws CloneNotSupportedException {
+            Node clone = new Node(item.clone(), null, null);
+            for (Node tempNext = next, temp = clone; tempNext != null; tempNext = tempNext.next, temp = temp.next) {
+                tempNext = new Node(tempNext.item.clone(), temp, tempNext.next);
+                temp.next = tempNext;
+            }
+            return clone;
+        }
+
+        /**
+         * The method that returns last node.
+         *
+         * @return the last cloning node
+         */
+        private Node lastNodeClone() {
+            Node clone = this;
+            for (Node temp = next; temp != null; temp = temp.next) {
+                if (temp.next == null) {
+                    clone = temp;
+                    break;
+                }
+            }
+            return clone;
         }
     }
 
@@ -255,12 +300,8 @@ public class LinkedTaskList extends AbstractTaskList {
     public LinkedTaskList clone() throws CloneNotSupportedException {
         LinkedTaskList clone = (LinkedTaskList) super.clone();
         if (first != null) {
-            clone.first = null;
-            clone.last = null;
-            clone.size = 0;
-            for (Task temp : this) {
-                clone.add(temp.clone());
-            }
+            clone.first = first.nodeClone();
+            clone.last = clone.first.lastNodeClone();
         }
         return clone;
     }
