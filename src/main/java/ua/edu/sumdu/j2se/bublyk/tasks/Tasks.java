@@ -33,7 +33,8 @@ public class Tasks {
         try {
             clone = (Iterable<Task>) tasks.getClass().getMethod("clone").invoke(tasks);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            System.out.println("Cannot create new object for \"tasks\". Result and your iterable object will be changed too.\n" + e.getMessage());
+            System.out.println("Cannot create new object for \"tasks\". Result and your iterable object will be changed too.");
+            e.printStackTrace(System.out);
             clone = tasks;
         }
         for (Iterator<Task> it = clone.iterator(); it.hasNext();) {

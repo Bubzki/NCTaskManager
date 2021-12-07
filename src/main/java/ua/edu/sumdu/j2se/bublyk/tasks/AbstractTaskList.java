@@ -1,9 +1,11 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
+import java.io.*;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.stream.Stream;
 
-public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
+public abstract class AbstractTaskList implements Iterable<Task>, Cloneable, Externalizable {
     public abstract void add(Task task);
 
     public abstract boolean remove(Task task);
@@ -58,4 +60,25 @@ public abstract class AbstractTaskList implements Iterable<Task>, Cloneable {
      * @return the stream of tasks
      */
     public abstract Stream<Task> getStream();
+
+    @Override
+    public abstract Iterator<Task> iterator();
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(size());
+        for (Task temp : this) {
+            temp.writeExternal(out);
+        }
+    }
+
+   @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        int size = in.readInt();
+        for (int i = 0; i < size; ++i) {
+            Task temp = new Task();
+            temp.readExternal(in);
+            add(temp);
+        }
+    }
 }

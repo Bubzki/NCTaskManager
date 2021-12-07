@@ -1,11 +1,10 @@
 package ua.edu.sumdu.j2se.bublyk.tasks;
 
-import java.time.Duration;
+import java.io.*;
+import java.time.*;
 import java.util.Objects;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
-public class Task implements Cloneable {
+public class Task implements Cloneable, Externalizable {
     private String title;
     private LocalDateTime time;
     private LocalDateTime start;
@@ -13,6 +12,12 @@ public class Task implements Cloneable {
     private Duration interval;
     private boolean active;
     private boolean repeated;
+
+    /**
+     * Default constructor for serialization.
+     */
+    public Task() {
+    }
 
     /**
      * Constructor that creates an inactive task
@@ -271,5 +276,75 @@ public class Task implements Cloneable {
     @Override
     public Task clone() throws CloneNotSupportedException {
         return (Task) super.clone();
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(title);
+        out.writeBoolean(active);
+        if (interval == null) {
+            out.writeLong(0L);
+        } else {
+            out.writeLong(interval.getSeconds());
+        }
+        if (this.isRepeated()) {
+            out.writeByte(start.getSecond());
+            out.writeByte(start.getMinute());
+            out.writeByte(start.getHour());
+            out.writeByte(start.getDayOfMonth());
+            out.writeByte(start.getMonthValue());
+            out.writeInt(start.getYear());
+
+            out.writeByte(end.getSecond());
+            out.writeByte(end.getMinute());
+            out.writeByte(end.getHour());
+            out.writeByte(end.getDayOfMonth());
+            out.writeByte(end.getMonthValue());
+            out.writeInt(end.getYear());
+        } else {
+            out.writeByte(time.getSecond());
+            out.writeByte(time.getMinute());
+            out.writeByte(time.getHour());
+            out.writeByte(time.getDayOfMonth());
+            out.writeByte(time.getMonthValue());
+            out.writeInt(time.getYear());
+        }
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException {
+        title = in.readUTF();
+        active = in.readBoolean();
+        long interval = in.readLong();
+        if (interval != 0L) {
+            byte[] startTimes = readExternalTimeOfBytes(in);
+            int startYear = in.readInt();
+            byte[] endTimes = readExternalTimeOfBytes(in);
+            int endYear = in.readInt();
+            start = LocalDateTime.of(startYear, startTimes[4], startTimes[3], startTimes[2], startTimes[1], startTimes[0]);
+            end = LocalDateTime.of(endYear, endTimes[4], endTimes[3], endTimes[2], endTimes[1], endTimes[0]);
+            this.interval = Duration.ofSeconds(interval);
+            repeated = true;
+        } else {
+            byte[] times = readExternalTimeOfBytes(in);
+            int timeYear = in.readInt();
+            time = LocalDateTime.of(timeYear, times[4], times[3], times[2], times[1], times[0]);
+            repeated = false;
+        }
+    }
+
+    /**
+     * Method that returns an array of read elements of type <code>bytes</code>.
+     *
+     * @param in the input stream
+     * @return the array of <code>bytes</code> elements
+     * @throws IOException if was failed or interrupted I/O operations.
+     */
+    private byte[] readExternalTimeOfBytes(ObjectInput in) throws IOException {
+        byte[] times = new byte[5];
+        for (int i = 0; i < times.length; ++i) {
+            times[i] = in.readByte();
+        }
+        return times;
     }
 }
