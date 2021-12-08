@@ -82,7 +82,7 @@ public class TaskIO {
      * @param out the output character stream
      */
     public static void write(AbstractTaskList taskList, Writer out) {
-        try {
+        try (BufferedWriter bufW = new BufferedWriter(out)) {
             GsonBuilder gsonBuilder;
             if (LinkedTaskList.class.equals(taskList.getClass())) {
                 gsonBuilder = gsonBuilderSerializerForLinkedTaskList();
@@ -90,7 +90,7 @@ public class TaskIO {
                 gsonBuilder = gsonBuilderSerializerForArrayTaskList();
             }
             Gson gson = gsonBuilder.setPrettyPrinting().create();
-            out.write(gson.toJson(taskList, taskList.getClass()));
+            bufW.write(gson.toJson(taskList, taskList.getClass()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -103,15 +103,19 @@ public class TaskIO {
      * @param in the input character stream
      */
     public static void read(AbstractTaskList taskList, Reader in) {
-        GsonBuilder gsonBuilder;
-        if (LinkedTaskList.class.equals(taskList.getClass())) {
-            gsonBuilder = gsonBuilderDeserializerForLinkedTaskList();
-        } else {
-            gsonBuilder = gsonBuilderDeserializerForArrayTaskList();
-        }
-        Gson gson = gsonBuilder.create();
-        for (Task temp : gson.fromJson(in, taskList.getClass())) {
-            taskList.add(temp);
+        try (BufferedReader bufR = new BufferedReader(in)) {
+            GsonBuilder gsonBuilder;
+            if (LinkedTaskList.class.equals(taskList.getClass())) {
+                gsonBuilder = gsonBuilderDeserializerForLinkedTaskList();
+            } else {
+                gsonBuilder = gsonBuilderDeserializerForArrayTaskList();
+            }
+            Gson gson = gsonBuilder.create();
+            for (Task temp : gson.fromJson(bufR, taskList.getClass())) {
+                taskList.add(temp);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
