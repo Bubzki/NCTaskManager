@@ -111,7 +111,7 @@ public class TaskIO {
                 gsonBuilder = gsonBuilderDeserializerForArrayTaskList();
             }
             Gson gson = gsonBuilder.create();
-            for (Task temp : gson.fromJson(in, taskList.getClass())) {
+            for (Task temp : gson.fromJson(bufR, taskList.getClass())) {
                 taskList.add(temp);
             }
         } catch (IOException e) {
