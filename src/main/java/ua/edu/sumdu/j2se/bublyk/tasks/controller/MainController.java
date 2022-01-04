@@ -350,6 +350,7 @@ public class MainController {
 
     private void showError(String headerMessage, String contentMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.initOwner(titleField.getScene().getWindow());
         alert.setTitle("Error");
         alert.setHeaderText(headerMessage);
         alert.setContentText(contentMessage);
@@ -358,6 +359,7 @@ public class MainController {
 
     private void showError(Exception exception) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.initOwner(titleField.getScene().getWindow());
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(exception.getMessage());
@@ -366,6 +368,7 @@ public class MainController {
 
     private void showError(String headerMessage, Exception exception) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.initOwner(titleField.getScene().getWindow());
         alert.setTitle("Error");
         alert.setHeaderText(headerMessage);
         Label label = new Label("Stack Trace:");

@@ -2,20 +2,25 @@ package ua.edu.sumdu.j2se.bublyk.tasks.notification;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ua.edu.sumdu.j2se.bublyk.tasks.TaskManager;
 import ua.edu.sumdu.j2se.bublyk.tasks.model.Task;
 import ua.edu.sumdu.j2se.bublyk.tasks.model.Tasks;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class Notificator extends Thread {
     private Iterable<Task> tasksList;
     private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     private final static int DEFAULT_NOTIFICATION_FREQUENCY = 30;
-    private int notificationFrequency ;
+    private int notificationFrequency;
+    private final Image icon = new Image(Objects.requireNonNull(TaskManager.class.getResource("TaskMangerIcon.png")).toExternalForm());
 
     public Notificator(Iterable<Task> tasksList) {
         this.tasksList = tasksList;
@@ -52,6 +57,8 @@ public class Notificator extends Thread {
         StringBuilder message = new StringBuilder();
         String verb;
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.getIcons().add(icon);
         alert.setTitle("Notification");
         alert.setHeaderText(null);
         alert.initModality(Modality.NONE);
