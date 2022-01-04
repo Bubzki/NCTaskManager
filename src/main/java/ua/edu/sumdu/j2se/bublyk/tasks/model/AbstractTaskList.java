@@ -1,4 +1,4 @@
-package ua.edu.sumdu.j2se.bublyk.tasks;
+package ua.edu.sumdu.j2se.bublyk.tasks.model;
 
 import java.io.*;
 import java.time.LocalDateTime;

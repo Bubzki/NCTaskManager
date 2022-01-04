@@ -1,4 +1,4 @@
-package ua.edu.sumdu.j2se.bublyk.tasks;
+package ua.edu.sumdu.j2se.bublyk.tasks.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
