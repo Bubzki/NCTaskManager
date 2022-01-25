@@ -18,15 +18,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MainController {
+    //load contr
     private final static String PATH_TO_LIST = "data/tasks.bin";
+
+    //view
     private final static int MIN_SPINNER_VALUE = 0;
     private final static int MAX_SPINNER_VALUE = Integer.MAX_VALUE;
     private final static int INIT_SPINNER_VALUE = 0;
+
+    //view
     private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+
+    //contr
     private NotificatorController notificator;
+
+    //contr
     private final AbstractTaskList list = TaskListFactory.createTaskList(ListTypes.types.ARRAY);
+
+    //main contr
     private LocalDateTime cachedFromField;
     private LocalDateTime cachedToField;
+
+    //view
     private static final Logger logger = Logger.getLogger(MainController.class);
 
     @FXML
@@ -84,6 +97,7 @@ public class MainController {
     @FXML
     private DateTimePicker toField;
 
+    //contr
     @FXML
     private void initialize() {
         titleMainColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -144,11 +158,12 @@ public class MainController {
         dateStyle();
         readingData();
         notificator = new NotificatorController(list);
-        notificator.updateNotificatorFrequency(60);
+        notificator.updateNotificationTime(10);
         notificator.runNotificator();
         loadMainTable();
     }
 
+    //view
     @FXML
     private void selectColumn() {
         if (mainTable.getSelectionModel().getSelectedItem() != null) {
@@ -171,6 +186,7 @@ public class MainController {
         }
     }
 
+    //main contr
     @FXML
     private void addButtonAction() {
         Task temp;
@@ -201,6 +217,7 @@ public class MainController {
         }
     }
 
+    //main contr
     @FXML
     private void editButtonAction() {
         if (mainTable.getSelectionModel().getSelectedItem() != null) {
@@ -233,6 +250,7 @@ public class MainController {
         }
     }
 
+    //main contr
     @FXML
     private void removeButtonAction() {
         if (mainTable.getSelectionModel().getSelectedItem() != null) {
@@ -246,6 +264,7 @@ public class MainController {
         }
     }
 
+    //main contr
     @FXML
     private void resetButtonAction() {
         unselectColumn();
@@ -254,6 +273,7 @@ public class MainController {
         loadMainTable();
     }
 
+    //main contr
     @FXML
     private void calendarButtonAction() {
         try {
@@ -266,6 +286,7 @@ public class MainController {
         }
     }
 
+    //main contr
     @FXML
     private void refreshButtonAction() {
         calendarTable.getSelectionModel().clearSelection();
@@ -276,6 +297,7 @@ public class MainController {
         }
     }
 
+    //contr
     private void loadMainTable() {
         ObservableList<Task> taskList = FXCollections.observableArrayList();
         for (Task temp : list) {
@@ -284,6 +306,7 @@ public class MainController {
         mainTable.setItems(taskList);
     }
 
+    //contr
     private void loadCalendarTable() {
         SortedMap<LocalDateTime, Set<Task>> map = Tasks.calendar(list, cachedFromField, cachedToField);
         List<CalendarTableHelper> calendarTableHelperList = new ArrayList<>(map.size());
@@ -294,6 +317,7 @@ public class MainController {
         calendarTable.setItems(calendar);
     }
 
+    //contr
     protected static class CalendarTableHelper {
         private LocalDateTime time;
         private String titles;
@@ -338,6 +362,7 @@ public class MainController {
         }
     }
 
+    //view
     private void unselectColumn() {
         mainTable.getSelectionModel().clearSelection();
         titleField.clear();
@@ -348,6 +373,7 @@ public class MainController {
         activeRadioFalse.setSelected(false);
     }
 
+    //view
     private void showError(String headerMessage, String contentMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initOwner(titleField.getScene().getWindow());
@@ -357,6 +383,7 @@ public class MainController {
         alert.showAndWait();
     }
 
+    //view
     private void showError(Exception exception) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initOwner(titleField.getScene().getWindow());
@@ -366,6 +393,7 @@ public class MainController {
         alert.showAndWait();
     }
 
+    //view
     private void showError(String headerMessage, Exception exception) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initOwner(titleField.getScene().getWindow());
@@ -389,6 +417,7 @@ public class MainController {
         alert.showAndWait();
     }
 
+    //view
     private void dateStyle() {
         startTimeField.setDateTimeValue(null);
         endTimeField.setDateTimeValue(null);
@@ -400,6 +429,7 @@ public class MainController {
         fromField.setFormat("dd.MM.yyyy HH:mm:ss");
     }
 
+    //load contr
     private void readingData() {
         Path path = Paths.get(PATH_TO_LIST);
         if (Files.notExists(path)) {
@@ -417,6 +447,7 @@ public class MainController {
         }
     }
 
+    //load contr
     public void writingData() {
         Path path = Paths.get(PATH_TO_LIST);
         if (Files.notExists(path)) {
@@ -434,6 +465,7 @@ public class MainController {
         TaskIO.writeBinary(list, path.toFile());
     }
 
+    //main contr
     private boolean textFieldIsEmpty(TextField textField) {
         if (textField.getText() == null) {
             return true;

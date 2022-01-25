@@ -18,18 +18,27 @@ import java.util.Set;
 public class Notificator extends Thread {
     private Iterable<Task> tasksList;
     private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private final static int DEFAULT_NOTIFICATION_FREQUENCY = 30;
-    private int notificationFrequency;
-    private final Image icon = new Image(Objects.requireNonNull(TaskManager.class.getResource("TaskMangerIcon.png")).toExternalForm());
+    private final static int DEFAULT_NOTIFICATION_TIME = 60;
+    private int notificationTime;
+    private final Image icon;
+
+    public Notificator(Iterable<Task> tasksList, Image icon) {
+        this.tasksList = tasksList;
+        this.icon = icon;
+        notificationTime = DEFAULT_NOTIFICATION_TIME;
+    }
 
     public Notificator(Iterable<Task> tasksList) {
         this.tasksList = tasksList;
-        notificationFrequency = DEFAULT_NOTIFICATION_FREQUENCY;
+        this.icon = new Image(Objects.requireNonNull(TaskManager.class.getResource("TaskMangerIcon.png")).toExternalForm());
+        notificationTime = DEFAULT_NOTIFICATION_TIME;
     }
 
     private Map.Entry<LocalDateTime, Set<Task>> notifyTask(int seconds) {
-        for (Map.Entry<LocalDateTime, Set<Task>> entry : Tasks.calendar(tasksList, LocalDateTime.now(), LocalDateTime.MAX).entrySet()) {
-            if (entry.getKey().isEqual(LocalDateTime.now().plusSeconds(seconds).withNano(0))) {
+        for (Map.Entry<LocalDateTime, Set<Task>> entry : Tasks.calendar(tasksList, LocalDateTime.now(), LocalDateTime.now().plusHours(1).plusSeconds(notificationTime)).entrySet()) {
+            System.out.println("Time: " + entry.getKey());
+            if (entry.getKey().withNano(0).isEqual(LocalDateTime.now().plusSeconds(seconds).withNano(0))) {
+                System.out.println("Time in: " + entry.getKey());
                 return entry;
             }
         }
@@ -40,10 +49,11 @@ public class Notificator extends Thread {
     public void run() {
         while (true) {
             try {
-                Map.Entry<LocalDateTime, Set<Task>> entry = notifyTask(notificationFrequency);
+                Map.Entry<LocalDateTime, Set<Task>> entry = notifyTask(notificationTime);
                 if (entry != null) {
+                    System.out.println("notification");
                     Platform.runLater(() -> {
-                        showAlert(entry, notificationFrequency);
+                        showAlert(entry, notificationTime);
                     });
                 }
                 sleep(1000);
@@ -81,8 +91,8 @@ public class Notificator extends Thread {
         alert.showAndWait();
     }
 
-    public void setNotificationFrequency(int seconds) {
-        notificationFrequency = seconds;
+    public void setNotificationTime(int seconds) {
+        notificationTime = seconds;
     }
 
     public void setTasksList(Iterable<Task> tasksList) {

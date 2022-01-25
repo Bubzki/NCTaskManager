@@ -6,16 +6,16 @@ import ua.edu.sumdu.j2se.bublyk.tasks.notification.Notificator;
 public class NotificatorController {
     private final Notificator notificator;
 
-    public NotificatorController(Iterable<Task> taskList) {
-        notificator = new Notificator(taskList);
+    protected NotificatorController(Controller controller) {
+        notificator = new Notificator(controller.getTaskList(), controller.icon);
     }
 
-    public void runNotificator() {
+    protected void runNotificator() {
         notificator.setDaemon(true);
         notificator.start();
     }
 
-    public void stopNotificator() {
+    protected void stopNotificator() {
         if (notificator.isAlive()) {
             notificator.stop();
         }
@@ -25,8 +25,8 @@ public class NotificatorController {
         notificator.setTasksList(list);
     }
 
-    public void updateNotificatorFrequency(int seconds) {
-        notificator.setNotificationFrequency(seconds);
+    protected void updateNotificationTime(int seconds) {
+        notificator.setNotificationTime(seconds);
     }
 
 }
