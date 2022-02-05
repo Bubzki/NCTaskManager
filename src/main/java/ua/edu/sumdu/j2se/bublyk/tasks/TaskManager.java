@@ -16,15 +16,16 @@ public class TaskManager extends Application {
 		PropertyConfigurator.configure(TaskManager.class.getResource("log4j.properties"));
 		FXMLLoader loader = new FXMLLoader(TaskManager.class.getResource("view.fxml"));
 		Scene scene = new Scene(loader.load());
+		Controller controller = loader.getController();
+		controller.logger.debug("App is running.");
 		stage.getIcons().add(new Image(Objects.requireNonNull(TaskManager.class.getResource("TaskMangerIcon.png")).toExternalForm()));
 		stage.setResizable(false);
 		stage.setTitle("Task Manager");
 		stage.setScene(scene);
 		stage.show();
 		stage.setOnCloseRequest(windowEvent -> {
-			System.out.println("Closing...");
-			Controller controller = loader.getController();
 			controller.writingData();
+			controller.logger.debug("App is closed.");
 		});
 	}
 

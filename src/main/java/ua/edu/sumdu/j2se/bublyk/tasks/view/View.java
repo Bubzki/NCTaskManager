@@ -19,6 +19,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * The class that is responsible for displaying the JavaFX window.
+ */
 public abstract class View {
     protected final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
@@ -77,17 +80,20 @@ public abstract class View {
     protected RadioButton repeatRadioFalse;
 
     @FXML
-    protected TableView<Controller.CalendarTableHelper> calendarTable;
+    protected TableView<View.CalendarTableHelper> calendarTable;
     @FXML
-    private TableColumn<Controller.CalendarTableHelper, String> titleCalendarColumn;
+    private TableColumn<View.CalendarTableHelper, String> titleCalendarColumn;
     @FXML
-    private TableColumn<Controller.CalendarTableHelper, String> timeCalendarColumn;
+    private TableColumn<View.CalendarTableHelper, String> timeCalendarColumn;
 
     @FXML
     protected DateTimePicker fromField;
     @FXML
     protected DateTimePicker toField;
 
+    /**
+     * The method that sets parameters to UI elements.
+     */
     protected void initializeView() {
         titleMainColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         timeMainColumn.setCellValueFactory(param -> {
@@ -147,6 +153,9 @@ public abstract class View {
         dateStyle();
     }
 
+    /**
+     * The method that loads tasks to the table in Main tab.
+     */
     protected void loadMainTable() {
         ObservableList<Task> taskList = FXCollections.observableArrayList();
         for (Task temp : list) {
@@ -155,16 +164,23 @@ public abstract class View {
         mainTable.setItems(taskList);
     }
 
+    /**
+     * The method that loads tasks to the table in Calendar tab.
+     */
     protected void loadCalendarTable() {
         SortedMap<LocalDateTime, Set<Task>> map = Tasks.calendar(list, cachedFromField, cachedToField);
         List<CalendarTableHelper> calendarTableHelperList = new ArrayList<>(map.size());
         for (Map.Entry<LocalDateTime, Set<Task>> entry : map.entrySet()) {
-            calendarTableHelperList.add(new Controller.CalendarTableHelper(entry.getKey(), entry.getValue()));
+            calendarTableHelperList.add(new View.CalendarTableHelper(entry.getKey(), entry.getValue()));
         }
-        ObservableList<Controller.CalendarTableHelper> calendar = FXCollections.observableList(calendarTableHelperList);
+        ObservableList<View.CalendarTableHelper> calendar = FXCollections.observableList(calendarTableHelperList);
         calendarTable.setItems(calendar);
     }
 
+    /**
+     * The class that transforms one element of {@link SortedMap} into
+     * object {@link CalendarTableHelper} to represent on Calendar table.
+     */
     protected static class CalendarTableHelper {
         private LocalDateTime time;
         private String titles;
@@ -209,6 +225,9 @@ public abstract class View {
         }
     }
 
+    /**
+     * The method that sets to fields values from the selected task in the table.
+     */
     @FXML
     private void selectColumn() {
         if (mainTable.getSelectionModel().getSelectedItem() != null) {
@@ -231,6 +250,9 @@ public abstract class View {
         }
     }
 
+    /**
+     * The method that clears selection in table, fields and radio buttons from Main tab.
+     */
     protected void unselectColumn() {
         mainTable.getSelectionModel().clearSelection();
         titleField.clear();
@@ -241,6 +263,12 @@ public abstract class View {
         activeRadioFalse.setSelected(false);
     }
 
+    /**
+     * The method that creates and displays Error alert.
+     *
+     * @param headerMessage message in the header of Error alert.
+     * @param contentMessage message in the content of Error alert.
+     */
     public void showError(String headerMessage, String contentMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initOwner(titleField.getScene().getWindow());
@@ -250,6 +278,11 @@ public abstract class View {
         alert.showAndWait();
     }
 
+    /**
+     * The method that creates and displays Error alert.
+     *
+     * @param exception exception from which the error message will be taken.
+     */
     public void showError(Exception exception) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initOwner(titleField.getScene().getWindow());
@@ -259,6 +292,12 @@ public abstract class View {
         alert.showAndWait();
     }
 
+    /**
+     * The method that creates and displays Error alert.
+     *
+     * @param headerMessage message in the header of Error alert.
+     * @param exception exception from which the stack trace will be taken.
+     */
     public void showError(String headerMessage, Exception exception) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initOwner(titleField.getScene().getWindow());
@@ -282,6 +321,9 @@ public abstract class View {
         alert.showAndWait();
     }
 
+    /**
+     * The method that sets date format to date fields.
+     */
     protected void dateStyle() {
         startTimeField.setDateTimeValue(null);
         endTimeField.setDateTimeValue(null);
